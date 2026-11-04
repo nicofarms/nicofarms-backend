@@ -38,7 +38,7 @@ const sendOtpEmail = async (user, subject) => {
 const issueToken = (user) => jwt.sign(
   { id: user._id, email: user.email, role: user.role },
   getJwtSecret(),
-  { expiresIn: process.env.JWT_EXPIRES_IN || "7d" }
+  { expiresIn: process.env.JWT_EXPIRES_IN || "24h" }
 );
 
 const verifyOtpValue = (user, otp) => {

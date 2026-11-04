@@ -29,7 +29,7 @@ const connectDB = async () => {
     });
 
     console.log(
-      `Database connected: ${connection.connection.host}/${connection.connection.name}`
+      `Database Connected Successfully` || `Database connected: ${connection.connection.host}/${connection.connection.name}`
     );
 
     return connection;
