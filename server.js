@@ -19,7 +19,12 @@ const swaggerSpec = swaggerJsdoc({
     },
     servers: [
       {
+        url: `https://nicofarms-backend.onrender.com/api-docs`,
+        description: "Live server",
+      },
+      {
         url: `http://localhost:${process.env.PORT || 2043}`,
+        description: "Local server",
       },
     ],
     components: {
