@@ -82,7 +82,7 @@ const { adminLogin, verifyAccountCreatedOtp, createAdmin, deleteAdmin, verifyAdm
 
 /**
  * @swagger
- * /admins/create:
+ * /admin/admins/create:
  *   post:
  *     summary: Create a new admin user
  *     tags: [Auth]
@@ -140,7 +140,7 @@ router.post("/admins/create", createAdmin);
 
 /**
  * @swagger
- * /admins/verify-otp:
+ * /admin/admins/verify-otp:
  *   post:
  *     summary: Verify OTP for account creation
  *     tags: [Auth]
@@ -209,7 +209,7 @@ router.post("/admins/verify-otp", verifyAccountCreatedOtp);
 
 /**
  * @swagger
- * /admins/login:
+ * /admin/admins/login:
  *   post:
  *     summary: Initiate Admin login by requesting an OTP
  *     tags: [Auth]
@@ -280,7 +280,7 @@ router.post("/admins/login", adminLogin);
 
 /**
  * @swagger
- * /admins/login-otp:
+ * /admin/admins/login-otp:
  *   post:
  *     summary: Verify login OTP and issue access token
  *     tags: [Auth]
@@ -363,7 +363,7 @@ router.post("/admins/login-otp", verifyAdminLoginOtp);
 
 /**
  * @swagger
- * /admins/delete:
+ * /admin/admins/delete:
  *   post:
  *     summary: Delete an admin user account
  *     tags: [Auth]

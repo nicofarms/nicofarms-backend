@@ -20,7 +20,7 @@ const swaggerSpec = swaggerJsdoc({
     },
     servers: [
       {
-        url: `https://nicofarms-backend.onrender.com`,
+        url: `https://nicofarms-backend.onrender.com/api`,
         description: "Live server",
       },
       {
