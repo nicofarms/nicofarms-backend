@@ -82,7 +82,7 @@ const { adminLogin, verifyAccountCreatedOtp, createAdmin, deleteAdmin, verifyAdm
 
 /**
  * @swagger
- * /admin/admins/create:
+ * /admin/create:
  *   post:
  *     summary: Create a new admin user
  *     tags: [Auth]
@@ -136,11 +136,11 @@ const { adminLogin, verifyAccountCreatedOtp, createAdmin, deleteAdmin, verifyAdm
  *             schema:
  *               $ref: '#/components/schemas/ErrorResponse'
  */
-router.post("/admins/create", createAdmin);
+router.post("/create", createAdmin);
 
 /**
  * @swagger
- * /admin/admins/verify-otp:
+ * /admin/verify-otp:
  *   post:
  *     summary: Verify OTP for account creation
  *     tags: [Auth]
@@ -205,11 +205,11 @@ router.post("/admins/create", createAdmin);
  *             schema:
  *               $ref: '#/components/schemas/ErrorResponse'
  */
-router.post("/admins/verify-otp", verifyAccountCreatedOtp);
+router.post("/verify-otp", verifyAccountCreatedOtp);
 
 /**
  * @swagger
- * /admin/admins/login:
+ * /admin/login:
  *   post:
  *     summary: Initiate Admin login by requesting an OTP
  *     tags: [Auth]
@@ -276,11 +276,11 @@ router.post("/admins/verify-otp", verifyAccountCreatedOtp);
  *               message: Server error
  *               error: Cannot read properties of null (reading 'isVerified')
  */
-router.post("/admins/login", adminLogin);
+router.post("/login", adminLogin);
 
 /**
  * @swagger
- * /admin/admins/login-otp:
+ * /admin/login-otp:
  *   post:
  *     summary: Verify login OTP and issue access token
  *     tags: [Auth]
@@ -359,11 +359,11 @@ router.post("/admins/login", adminLogin);
  *             schema:
  *               $ref: '#/components/schemas/ErrorResponse'
  */
-router.post("/admins/login-otp", verifyAdminLoginOtp);
+router.post("/login-otp", verifyAdminLoginOtp);
 
 /**
  * @swagger
- * /admin/admins/delete:
+ * /admin/delete:
  *   post:
  *     summary: Delete an admin user account
  *     tags: [Auth]
@@ -379,6 +379,6 @@ router.post("/admins/login-otp", verifyAdminLoginOtp);
  *               email:
  *                 type: string
  */
-router.post("/admins/delete", deleteAdmin);
+router.post("/delete", deleteAdmin);
 
 module.exports = router;
