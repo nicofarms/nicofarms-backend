@@ -1,77 +1,88 @@
-const contactModel = require("../models/contact.js");
-const { sendEmail } = require("../utils/sendEmail.js");
+const mongoose = require("mongoose");
+const Video = require("../models/videoModel");
 
-exports.handleContactForm = async (req, res) => {
+// Supports watch?v=, youtu.be/, /embed/, /shorts/
+const extractYoutubeId = (url) => {
   try {
-    const { name, email, phone, subject, message } = req.body;
-
-    if (!name || !email || !message) {
-      return res.status(400).json({
-        success: false,
-        message: "Name, email, and message are required",
-      });
+    const u = new URL(url);
+    const host = u.hostname.replace(/^www\.|^m\./, "");
+    let id = null;
+    if (host === "youtu.be") id = u.pathname.slice(1);
+    else if (host === "youtube.com") {
+      if (u.pathname === "/watch") id = u.searchParams.get("v");
+      else {
+        const m = u.pathname.match(/^\/(embed|shorts)\/([^/?]+)/);
+        if (m) id = m[2];
+      }
     }
-
-    const newContact = new contactModel({ name, email, phone, subject, message });
-    await newContact.save();
-
-    await sendEmail({
-      email: process.env.CONTACT_RECEIVER_EMAIL || process.env.user,
-      subject: subject || `New Contact Form Submission from ${name}`,
-      message: `You received a message from ${name} (${email}${phone ? `, ${phone}` : ""}): \n\n${message}`,
-    });
-
-    res.status(201).json({
-      success: true,
-      message: "Message sent successfully",
-      contact: newContact,
-    });
-  } catch (error) {
-    console.error("Contact Controller Error:", error.message);
-    res.status(500).json({
-      success: false,
-      message: "Internal Server Error",
-    });
+    return id && /^[\w-]{11}$/.test(id) ? id : null;
+  } catch {
+    return null;
   }
 };
 
-exports.getAllContacts = async (req, res) => {
-  try {
-    const contacts = await contactModel.find().sort({ createdAt: -1 });
+const isValidId = (id) => mongoose.Types.ObjectId.isValid(id);
 
-    res.status(200).json({
-      success: true,
-      contacts,
-    });
+exports.createVideo = async (req, res) => {
+  try {
+    const { title, youtubeUrl } = req.body;
+    if (!youtubeUrl) {
+      return res.status(400).json({ success: false, message: "youtubeUrl is required" });
+    }
+    const youtubeId = extractYoutubeId(youtubeUrl);
+    if (!youtubeId) {
+      return res.status(400).json({ success: false, message: "Invalid YouTube URL" });
+    }
+    const video = await Video.create({ title, youtubeUrl, youtubeId, createdBy: req.user.id });
+    return res.status(201).json({ success: true, video });
   } catch (error) {
-    console.error("Get Contacts Error:", error.message);
-    res.status(500).json({
-      success: false,
-      message: "Internal Server Error",
-    });
+    console.error("Create Video Error:", error.message);
+    return res.status(500).json({ success: false, message: "Server error" });
   }
 };
 
-exports.getContactById = async (req, res) => {
+exports.getVideos = async (req, res) => {
   try {
-    const contact = await contactModel.findById(req.params.id);
-
-    if (!contact) {
-      return res.status(404).json({
-        success: false,
-        message: "Contact not found",
-      });
-    }
-
-    return res.status(200).json({
-      success: true,
-      contact,
-    });
+    const videos = await Video.find().sort({ createdAt: -1 });
+    return res.status(200).json({ success: true, videos });
   } catch (error) {
-    console.error("Get Contact Error:", error.message);
-    return res.status(500).json({
-      success: false,
-      message: "Internal Server Error",
-    });
+    console.error("Get Videos Error:", error.message);
+    return res.status(500).json({ success: false, message: "Server error" });
+  }
+};
+
+exports.getVideoById = async (req, res) => {
+  try {
+    if (!isValidId(req.params.id)) return res.status(400).json({ success: false, message: "Invalid id" });
+    const video = await Video.findById(req.params.id);
+    if (!video) return res.status(404).json({ success: false, message: "Video not found" });
+    return res.status(200).json({ success: true, video });
+  } catch (error) {
+    console.error("Get Video Error:", error.message);
+    return res.status(500).json({ success: false, message: "Server error" });
+  }
+};
+
+exports.updateVideo = async (req, res) => {
+  try {
+    if (!isValidId(req.params.id)) return res.status(400).json({ success: false, message: "Invalid id" });
+    const { title, youtubeUrl } = req.body;
+    const updates = {};
+    if (title !== undefined) updates.title = title;
+    if (youtubeUrl !== undefined) {
+      const youtubeId = extractYoutubeId(youtubeUrl);
+      if (!youtubeId) return res.status(400).json({ success: false, message: "Invalid YouTube URL" });
+      updates.youtubeUrl = youtubeUrl;
+      updates.youtubeId = youtubeId;
+    }
+    if (Object.keys(updates).length === 0) {
+      return res.status(400).json({ success: false, message: "Nothing to update" });
+    }
+    const video = await Video.findByIdAndUpdate(req.params.id, updates, { new: true, runValidators: true });
+    if (!video) return res.status(404).json({ success: false, message: "Video not found" });
+    return res.status(200).json({ success: true, video });
+  } catch (error) {
+    console.error("Update Video Error:", error.message);
+    return res.status(500).json({ success: false, message: "Server error" });
   }
 };

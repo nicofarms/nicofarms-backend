@@ -229,7 +229,7 @@ router.post("/admins/verify-otp", verifyAccountCreatedOtp);
  *               email: admin@nicofarms.com
  *     responses:
  *       200:
- *         description: OTP generated and sent to email successfully
+ *         description: OTP generated and sent to email successfully for verified admins
  *         content:
  *           application/json:
  *             schema:
@@ -239,23 +239,44 @@ router.post("/admins/verify-otp", verifyAccountCreatedOtp);
  *                   type: string
  *             example:
  *               message: OTP sent to email
- *       404:
- *         description: Admin not found
+ *       403:
+ *         description: Admin account exists but is not verified yet. A new verification OTP was sent instead.
  *         content:
  *           application/json:
  *             schema:
- *               $ref: '#/components/schemas/ErrorResponse'
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *             example:
+ *               message: Admin account not verified. New verification OTP sent to email.
+ *       404:
+ *         description: Admin profile with specified email not found
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
  *             example:
  *               message: Admin not found
  *       500:
- *         description: Server error
+ *         description: Internal Server Error
  *         content:
  *           application/json:
  *             schema:
- *               $ref: '#/components/schemas/ErrorResponse'
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                 error:
+ *                   type: string
+ *             example:
+ *               message: Server error
+ *               error: Cannot read properties of null (reading 'isVerified')
  */
 router.post("/admins/login", adminLogin);
-
 
 /**
  * @swagger

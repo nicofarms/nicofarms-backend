@@ -21,8 +21,8 @@ exports.createAdmin = async (req, res) => {
     }
 
     const otp = generateOTP();
-    const otpExpires = Date.now() + 5 * 60 * 1000;
-    const newUser = new userModel({ name, email, role, otp, otpExpires });
+    const otpExpiresAt = Date.now() + 5 * 60 * 1000;
+    const newUser = new userModel({ name, email, role, otp, otpExpiresAt });
     await newUser.save();
 
     await sendMail({
@@ -50,7 +50,7 @@ exports.verifyAccountCreatedOtp = async (req, res) => {
       return res.status(400).json({ message: "User already verified" });
     }
 
-    if (user.otpExpires < Date.now()) {
+    if (user.otpExpiresAt < Date.now()) {
       return res.status(400).json({ message: "OTP has expired" });
     }
 
@@ -60,7 +60,7 @@ exports.verifyAccountCreatedOtp = async (req, res) => {
 
     user.isVerified = true;
     user.otp = null;
-    user.otpExpires = null;
+    user.otpExpiresAt = null;
     await user.save();
 
     const token = jwt.sign({ id: user._id, role: user.role }, process.env.JWT_SECRET, { expiresIn: '1h' });
@@ -92,7 +92,6 @@ exports.deleteAdmin = async (req, res)=> {
     res.status(500).json({ message: "Server error" });
   }
 }
-
 exports.adminLogin = async (req, res) => {
   try {
     const { email } = req.body;
@@ -100,8 +99,28 @@ exports.adminLogin = async (req, res) => {
 
     if (!admin) {
       return res.status(404).json({ message: "Admin not found" });
-    };
+    }
 
+    /* NOTE: If the admin is not verified, generate a new OTP, update expiration, save it, and send it */
+    if (!admin.isVerified) {
+      const verificationOtp = generateOTP();
+      const otpExpiresAt = Date.now() + 5 * 60 * 1000; // 5 minutes expiration
+
+      admin.otp = verificationOtp;
+      admin.otpExpiresAt = otpExpiresAt;
+      await admin.save();
+
+      await sendMail({
+        email,
+        subject: "Nicofarms otp verification",
+        text: `Your OTP is ${verificationOtp}`,
+        html: `<p>Your OTP is <strong>${verificationOtp}</strong></p>`,
+      });
+      
+      return res.status(403).json({ message: "Admin account not verified. New verification OTP sent to email." });
+    }
+
+    // Normal flow for verified admins
     const emailOtp = generateOTP();
     const otpExpiresAt = Date.now() + 5 * 60 * 1000; 
     
@@ -112,7 +131,6 @@ exports.adminLogin = async (req, res) => {
       html: `<p>Your OTP is <strong>${emailOtp}</strong></p>`,
     });
 
-
     admin.otp = emailOtp;
     admin.otpExpiresAt = otpExpiresAt;
     await admin.save();
@@ -122,8 +140,8 @@ exports.adminLogin = async (req, res) => {
     console.error("detailed login error:", error); 
     res.status(500).json({ message: "Server error", error: error.message });
   }
-
 };
+
 
 
 exports.verifyAdminLoginOtp = async (req, res) => {
@@ -145,10 +163,10 @@ exports.verifyAdminLoginOtp = async (req, res) => {
 
 
     admin.otp = null;
-    admin.otpExpires = null;
+    admin.otpExpiresAt = null;
     await admin.save();
 
-    const token = jwt.sign({ id: admin._id, role: admin.role }, process.env.JWT_SECRET, { expiresIn: '1h' });
+    const token = jwt.sign({ id: admin._id, role: admin.role }, process.env.JWT_SECRET, { expiresIn: '24h' });
     res.status(200).json({ message: "Admin logged in successfully", token, admin: { id: admin._id, name: admin.name, email: admin.email, role: admin.role } });
 
   } catch(error) {

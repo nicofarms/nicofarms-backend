@@ -6,7 +6,8 @@ const swaggerUi = require("swagger-ui-express");
 const app = express();
 const adminRoutes = require("./routes/adminRoute.js");
 const contactRoutes = require("./routes/contactRoutes.js");
-const productRoutes = require("./routes/productRoutes.js");
+const staffRoutes = require("./routes/staffRoute.js");
+const videoRoutes = require("./routes/videoRoute.js");
 
 app.use(express.json());
 
@@ -43,7 +44,8 @@ const swaggerSpec = swaggerJsdoc({
 app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 app.use("/api/admin", adminRoutes);
 app.use("/api/contact", contactRoutes);
-app.use("/api/products", productRoutes);
+app.use("/api/staff", staffRoutes);
+app.use("/api/videos", videoRoutes);
 
 const PORT = process.env.PORT || 2043;
 

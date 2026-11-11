@@ -16,9 +16,9 @@ exports.handleContactForm = async (req, res) => {
     await newContact.save();
 
     await sendEmail({
-      email: process.env.CONTACT_RECEIVER_EMAIL || process.env.user,
+      email: process.env.CONTACT_RECEIVER_EMAIL || process.env.EMAIL_USER,
       subject: subject || `New Contact Form Submission from ${name}`,
-      message: `You received a message from ${name} (${email}${phone ? `, ${phone}` : ""}): \n\n${message}`,
+      message: `You received a message from ${name } ${email} ${phone }: \n\n${message}`,
     });
 
     res.status(201).json({
