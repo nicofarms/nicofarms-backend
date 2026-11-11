@@ -174,3 +174,14 @@ exports.verifyAdminLoginOtp = async (req, res) => {
     res.status(500).json({ message: "Server error", error: error.message });
   }
 };
+
+exports.getAllAdmins = async(req, res) => {
+  try{
+    const admins = await userModel.find({ role: "admin" }).select('-otp -otpExpiresAt -__v');
+    res.status(200).json({ message: "Admins retrieved successfully", admins });
+
+  }catch(error){
+    console.error("detailed get all admins error:", error);
+    res.status(500).json({ message: "Server error", error: error.message });
+  }
+}

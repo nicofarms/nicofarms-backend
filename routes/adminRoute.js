@@ -1,6 +1,6 @@
 const router = require("express").Router();
 
-const { adminLogin, verifyAccountCreatedOtp, createAdmin, deleteAdmin, verifyAdminLoginOtp} = require("../controllers/adminController");
+const { adminLogin, verifyAccountCreatedOtp, createAdmin, deleteAdmin, verifyAdminLoginOtp, getAllAdmins} = require("../controllers/adminController");
 
 /**
  * @swagger
@@ -380,5 +380,46 @@ router.post("/login-otp", verifyAdminLoginOtp);
  *                 type: string
  */
 router.post("/delete", deleteAdmin);
+
+/**
+ * @swagger
+ * /admin/all:
+ *   get:
+ *     summary: Retrieve a list of all admin users
+ *     tags: [Auth]
+ *     responses:
+ *       200:
+ *         description: List of admin users retrieved successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                 admins:
+ *                   type: array
+ *                   items:
+ *                     $ref: '#/components/schemas/User'
+ *             example:
+ *               message: Admins retrieved successfully
+ *               admins:
+ *                 - id: 60d5ecb71f00002f48375624
+ *                   name: Admin User 1
+ *                   email: admin1@nicofarms.com
+ *                   role: admin
+ *                 - id: 60d5ecb71f00002f48375625
+ *                   name: Admin User 2
+ *                   email: admin2@nicofarms.com
+ *                   role: admin
+ *       500:
+ *         description: Server error
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/ErrorResponse'
+ */
+router.get("/all", getAllAdmins);
+
 
 module.exports = router;
