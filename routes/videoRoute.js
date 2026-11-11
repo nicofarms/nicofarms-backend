@@ -49,7 +49,7 @@ const c = require("../controllers/videoController");
 
 /**
  * @swagger
- * /api/videos:
+ * /videos:
  *   get:
  *     summary: Retrieve all videos
  *     description: Public endpoint to fetch all submitted videos sorted by newest creation date.
@@ -116,7 +116,7 @@ router.post("/", auth, c.createVideo);
 
 /**
  * @swagger
- * /api/videos/{id}:
+ * /videos/{id}:
  *   get:
  *     summary: Get a specific video by ID
  *     description: Public endpoint to view detailed metadata for an isolated video entry.

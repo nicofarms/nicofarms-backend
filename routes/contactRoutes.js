@@ -53,7 +53,7 @@ router.post("/", handleContactForm);
 
 /**
  * @swagger
- * /api/contact:
+ * /contact:
  *   get:
  *     summary: Get all contact messages
  *     tags: [Contacts]
@@ -69,7 +69,7 @@ router.get("/", auth, getAllContacts);
 
 /**
  * @swagger
- * /api/contact/{id}:
+ * /contact/{id}:
  *   get:
  *     summary: Get one contact message
  *     tags: [Contacts]
