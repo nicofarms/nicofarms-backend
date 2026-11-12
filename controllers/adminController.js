@@ -1,5 +1,5 @@
 const userModel = require('../models/userModel');
-const sendMail = require('../utils/sendEmail');
+const sendEmail = require('../utils/sendEmail');
 const otpGenerator = require('otp-generator');
 const jwt = require('jsonwebtoken');
 
@@ -23,16 +23,17 @@ exports.createAdmin = async (req, res) => {
     const otp = generateOTP();
     const otpExpiresAt = Date.now() + 5 * 60 * 1000;
     const newUser = new userModel({ name, email, role, otp, otpExpiresAt });
-    await newUser.save();
-
-    await sendMail({
+    
+    await sendEmail({
       email,
       subject: "Nicofarms otp verification",
       text: `Your OTP is ${otp}`,
       html: `<p>Your OTP is <strong>${otp}</strong></p>`,
     });
+    await newUser.save();
     res.status(201).json({ message: "User created and OTP sent to email" });
     } catch (error) {
+      console.error("detailed create admin error:", error);
         res.status(500).json({ message: "Server error" });
     }
 };
@@ -110,7 +111,7 @@ exports.adminLogin = async (req, res) => {
       admin.otpExpiresAt = otpExpiresAt;
       await admin.save();
 
-      await sendMail({
+      await sendEmail({
         email,
         subject: "Nicofarms otp verification",
         text: `Your OTP is ${verificationOtp}`,
@@ -124,7 +125,7 @@ exports.adminLogin = async (req, res) => {
     const emailOtp = generateOTP();
     const otpExpiresAt = Date.now() + 5 * 60 * 1000; 
     
-    await sendMail({
+    await sendEmail({
       email,
       subject: "Nicofarms Login Email",
       text: `Your OTP is ${emailOtp}`,
