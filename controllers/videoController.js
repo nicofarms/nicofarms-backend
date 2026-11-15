@@ -86,3 +86,16 @@ exports.updateVideo = async (req, res) => {
     return res.status(500).json({ success: false, message: "Server error" });
   }
 };
+
+exports.deleteVideo = async (req, res) => {
+  try {
+    if (!isValidId(req.params.id)) return res.status(400).json({ success: false, message: "Invalid id" });
+    const video = await Video.findByIdAndDelete(req.params.id);
+    if (!video) return res.status(404).json({ success: false, message: "Video not found" });
+    return res.status(200).json({ success: true, message: "Video deleted" });
+  } catch (error) {
+    console.error("Delete Video Error:", error.message);
+    return res.status(500).json({ success: false, message: "Server error" });
+    
+  }
+}

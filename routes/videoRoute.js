@@ -195,5 +195,70 @@ router.post("/", auth, c.createVideo);
  */
 router.put("/:id", auth, c.updateVideo);
 router.get("/:id", c.getVideoById);
+/**
+ * @swagger
+ * /videos/{id}:
+ *   delete:
+ *     summary: Delete a video by ID (Admin only)
+ *     description: Protected endpoint allowing authenticated admins to permanently delete a video record.
+ *     tags: [Videos]
+ *     security:
+ *       - BearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: The MongoDB hex string ID of the video record to delete
+ *     responses:
+ *       200:
+ *         description: Video deleted successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *                 message:
+ *                   type: string
+ *             example:
+ *               success: true
+ *               message: Video deleted
+ *       400:
+ *         description: Invalid MongoDB Object ID syntax
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *                 message:
+ *                   type: string
+ *             example:
+ *               success: false
+ *               message: Invalid id
+ *       401:
+ *         description: Unauthorized (Token missing or invalid)
+ *       404:
+ *         description: Video record not found
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *                 message:
+ *                   type: string
+ *             example:
+ *               success: false
+ *               message: Video not found
+ *       500:
+ *         description: Server error
+ */
+router.delete("/:id", auth, c.deleteVideo);
 
 module.exports = router;
