@@ -8,7 +8,15 @@ const adminRoutes = require("./routes/adminRoute.js");
 const contactRoutes = require("./routes/contactRoutes.js");
 const staffRoutes = require("./routes/staffRoute.js");
 const videoRoutes = require("./routes/videoRoute.js");
+const cors = require("cors");
 
+const corsOptions = {
+  origin: "*", 
+  methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+  allowedHeaders: ["Content-Type", "Authorization"],
+};
+
+app.use(cors(corsOptions));
 app.use(express.json());
 
 const swaggerSpec = swaggerJsdoc({
