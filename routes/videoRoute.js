@@ -75,7 +75,7 @@ const c = require("../controllers/videoController");
  *     description: Protected endpoint allowing authenticated admins to upload a video URL.
  *     tags: [Videos]
  *     security:
- *       - BearerAuth: []
+ *       - bearerAuth: []
  *     requestBody:
  *       required: true
  *       content:
@@ -151,7 +151,7 @@ router.post("/", auth, c.createVideo);
  *     description: Protected endpoint allowing authenticated admins to modify specific attributes.
  *     tags: [Videos]
  *     security:
- *       - BearerAuth: []
+ *       - bearerAuth: []
  *     parameters:
  *       - in: path
  *         name: id
@@ -203,7 +203,7 @@ router.get("/:id", c.getVideoById);
  *     description: Protected endpoint allowing authenticated admins to permanently delete a video record.
  *     tags: [Videos]
  *     security:
- *       - BearerAuth: []
+ *       - bearerAuth: []
  *     parameters:
  *       - in: path
  *         name: id
