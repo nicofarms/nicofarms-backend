@@ -64,7 +64,7 @@ const {
 
 /**
  * @swagger
- * /api/staff:
+ * /staff:
  *   post:
  *     summary: Create a new staff member
  *     tags: [Staff]
@@ -116,7 +116,7 @@ router.post("/", auth, createStaff);
 
 /**
  * @swagger
- * /api/staff:
+ * /staff:
  *   get:
  *     summary: Get all staff members
  *     tags: [Staff]
@@ -142,7 +142,7 @@ router.get("/", getAllStaff);
 
 /**
  * @swagger
- * /api/staff/{id}:
+ * /staff/{id}:
  *   get:
  *     summary: Get a single staff member by ID
  *     tags: [Staff]
@@ -175,7 +175,7 @@ router.get("/:id", getStaffById);
 
 /**
  * @swagger
- * /api/staff/{id}:
+ * /staff/{id}:
  *   put:
  *     summary: Update a staff member by ID
  *     tags: [Staff]
@@ -227,7 +227,7 @@ router.put("/:id", auth, updateStaff);
 
 /**
  * @swagger
- * /api/staff/{id}:
+ * /staff/{id}:
  *   delete:
  *     summary: Delete a staff member by ID
  *     tags: [Staff]
