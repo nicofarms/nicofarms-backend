@@ -1,7 +1,7 @@
 const router = require("express").Router();
 
 const { adminLogin, verifyAccountCreatedOtp, createAdmin, deleteAdmin, verifyAdminLoginOtp, getAllAdmins} = require("../controllers/adminController");
-
+const auth  = require("../middleware/auth");
 /**
  * @swagger
  * components:
@@ -360,13 +360,14 @@ router.post("/login", adminLogin);
  *               $ref: '#/components/schemas/ErrorResponse'
  */
 router.post("/login-otp", verifyAdminLoginOtp);
-
 /**
  * @swagger
  * /admin/delete:
- *   post:
+ *   delete:
  *     summary: Delete an admin user account
  *     tags: [Auth]
+ *     security:
+ *       - bearerAuth: []
  *     requestBody:
  *       required: true
  *       content:
@@ -378,8 +379,53 @@ router.post("/login-otp", verifyAdminLoginOtp);
  *             properties:
  *               email:
  *                 type: string
+ *                 format: email
+ *                 example: admin@example.com
+ *     responses:
+ *       200:
+ *         description: Admin account successfully deleted
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: Admin account successfully deleted
+ *       400:
+ *         description: User is not an admin
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/ErrorResponse'
+ *             example:
+ *               message: User is not an admin
+ *       403:
+ *         description: Forbidden - Insufficient permissions
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/ErrorResponse'
+ *             example:
+ *               message: You do not have permission to perform this action
+ *       404:
+ *         description: Admin not found
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/ErrorResponse'
+ *             example:
+ *               message: Admin not found
+ *       500:
+ *         description: Server error
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/ErrorResponse'
+ *             example:
+ *               message: Internal server error
  */
-router.post("/delete", deleteAdmin);
+router.delete("/delete", auth, deleteAdmin);
 
 /**
  * @swagger
@@ -419,7 +465,7 @@ router.post("/delete", deleteAdmin);
  *             schema:
  *               $ref: '#/components/schemas/ErrorResponse'
  */
-router.get("/all", getAllAdmins);
+router.get("/all", auth, getAllAdmins);
 
 
 module.exports = router;
