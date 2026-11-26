@@ -1,19 +1,31 @@
 const staffModel = require('../models/staffModel');
+const cloudinary = require('cloudinary').v2;
+const fs = require('fs');
 
 exports.createStaff = async (req, res) => {
     try {
-        const { name, office, briefIntro, detailedIntro, imageUrl } = req.body;
+        const { name, office, briefIntro, detailedIntro } = req.body;
         const existingStaff = await staffModel.findOne({ name });
-        if (existingStaff) {
+         if (existingStaff) {
+            if (req.file) fs.unlinkSync(req.file.path); // Clean up temp file if duplicate
             return res.status(400).json({ message: "Staff with this name already exists" });
         }
+
+        let imageUrl;
+        if (req.file) {
+            const result = await cloudinary.uploader.upload(req.file.path, {
+                folder: "staff",
+            });
+            imageUrl = result.secure_url;
+            fs.unlinkSync(req.file.path); // Remove local temp file after Cloudinary upload
+        }
         const newStaff = new staffModel({ name, office, briefIntro, detailedIntro, imageUrl });
-        if (!name) {
-            return res.status(400).json({ message: "Name is required" });
-        };
         await newStaff.save();
         res.status(201).json({ message: "Staff created successfully", staff: newStaff });
     } catch (error) {
+        if (req.file && fs.existsSync(req.file.path)) {
+            fs.unlinkSync(req.file.path);
+        }
         console.error("Error creating staff:", error);
         res.status(500).json({ message: "Server error" });
     }
@@ -47,16 +59,28 @@ exports.updateStaff = async (req, res) => {
         const { name, office, briefIntro, detailedIntro, imageUrl } = req.body;
         const staff = await staffModel.findById(req.params.id);
         if (!staff) {
+            if (req.file) fs.unlinkSync(req.file.path); 
             return res.status(404).json({ message: "Staff not found" });
         }
         if (name !== undefined) staff.name = name;
         if (office !== undefined) staff.office = office;
         if (briefIntro !== undefined) staff.briefIntro = briefIntro;
         if (detailedIntro !== undefined) staff.detailedIntro = detailedIntro;
-        if (imageUrl !== undefined) staff.imageUrl = imageUrl;
+        if (req.file) {
+            const result = await cloudinary.uploader.upload(req.file.path, {
+                folder: "staff",
+            });
+            staff.imageUrl = result.secure_url;
+            fs.unlinkSync(req.file.path); 
+        } else if (imageUrl !== undefined) {
+            staff.imageUrl = imageUrl;
+        }
         await staff.save();
         res.status(200).json({ message: "Staff updated successfully", staff });
     } catch (error) {
+        if (req.file && fs.existsSync(req.file.path)) {
+            fs.unlinkSync(req.file.path);
+        }
         console.error("Error updating staff:", error);
         res.status(500).json({ message: "Server error" });
     }

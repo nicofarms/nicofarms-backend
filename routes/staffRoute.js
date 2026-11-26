@@ -1,5 +1,6 @@
 const router = require("express").Router();
 const auth = require("../middleware/auth");
+const { uploadProfilePic } = require("../utils/multer");
 const {
   createStaff,
   getAllStaff,
@@ -112,7 +113,7 @@ const {
  *       500:
  *         description: Server error
  */
-router.post("/", auth, createStaff);
+router.post("/", auth, uploadProfilePic.single("image"), createStaff);
 
 /**
  * @swagger
@@ -223,7 +224,7 @@ router.get("/:id", getStaffById);
  *       500:
  *         description: Server error
  */
-router.put("/:id", auth, updateStaff);
+router.put("/:id", auth, uploadProfilePic.single("image"), updateStaff);
 
 /**
  * @swagger
